@@ -18,10 +18,10 @@ class Instance(object):
     '''
 
     def __init__(self, instance_name):
-        '''
-        Constructor
-        '''
-        raise "Not implemented error"
+        self._instance_name = instance_name
+        self._jobs = []
+        self._machines = []
+        self._operations = []
 
     @classmethod
     def from_file(cls, folderpath):
