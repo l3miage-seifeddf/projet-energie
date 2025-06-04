@@ -11,6 +11,16 @@ from src.scheduling.solution import Solution
 from src.scheduling.optim.heuristics import Heuristic
 
 
+def _evaluate_cost(operation, machine) -> float:
+    '''
+    Evaluates the cost of assigning an operation to a machine.
+    Cost can be based on energy consumption or duration.
+    '''
+    energy_cost = machine.total_energy_consumption
+    duration_cost = operation.processing_time
+    return energy_cost + duration_cost
+
+
 class Greedy(Heuristic):
     '''
     A deterministic greedy method to return a solution.
@@ -22,7 +32,7 @@ class Greedy(Heuristic):
         @param params: The parameters of your heuristic method if any as a
                dictionary. Implementation should provide default values in the function.
         '''
-        pass
+        self.params = params
 
     def run(self, instance: Instance, params: Dict=dict()) -> Solution:
         '''
@@ -33,7 +43,19 @@ class Greedy(Heuristic):
         @param instance: the instance to solve
         @param params: the parameters for the run
         '''
-        pass
+        solution = Solution(instance)
+        for job in instance.jobs:
+            for operation in job.operations:
+                best_machine = None
+                best_cost = float('inf')
+                for machine in instance.machines:
+                    cost = _evaluate_cost(operation, machine)
+                    if cost < best_cost:
+                        best_cost = cost
+                        best_machine = machine
+                if best_machine:
+                    solution.schedule(operation, best_machine)
+        return solution
 
 
 class NonDeterminist(Heuristic):
@@ -48,7 +70,7 @@ class NonDeterminist(Heuristic):
         @param params: The parameters of your heuristic method if any as a
                dictionary. Implementation should provide default values in the function.
         '''
-        raise "Not implemented error"
+        self.params = params
 
     def run(self, instance: Instance, params: Dict=dict()) -> Solution:
         '''
@@ -59,7 +81,15 @@ class NonDeterminist(Heuristic):
         @param instance: the instance to solve
         @param params: the parameters for the run
         '''
-        raise "Not implemented error"
+        solution = Solution(instance)
+        for job in instance.jobs:
+            for operation in job.operations:
+                feasible_machines = [machine for machine in operation.machines if
+                                     machine.available_time <= operation.min_start_time]
+                if feasible_machines:
+                    selected_machine = random.choice(feasible_machines)
+                    solution.schedule(operation, selected_machine)
+        return solution
 
 
 if __name__ == "__main__":

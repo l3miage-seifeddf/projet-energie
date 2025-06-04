@@ -5,6 +5,8 @@ Object containing the solution to the optimization problem.
 '''
 from typing import List
 from matplotlib import pyplot as plt
+
+from src.scheduling.instance.machine import Machine
 from src.scheduling.instance.instance import Instance
 from src.scheduling.instance.operation import Operation
 
@@ -21,7 +23,8 @@ class Solution(object):
         '''
         Constructor
         '''
-        raise "Not implemented error"
+        self._instance = instance
+        self._operations = {op: None for op in instance.operations}
 
 
     @property
@@ -29,14 +32,14 @@ class Solution(object):
         '''
         Returns the associated instance
         '''
-        raise "Not implemented error"
+        return self._instance
 
 
     def reset(self):
         '''
         Resets the solution: everything needs to be replanned
         '''
-        raise "Not implemented error"
+        self._operations = {op: None for op in self._instance.operations}
 
     @property
     def is_feasible(self) -> bool:
@@ -44,35 +47,35 @@ class Solution(object):
         Returns True if the solution respects the constraints.
         To call this function, all the operations must be planned.
         '''
-        raise "Not implemented error"
+        return all(op.assigned for op in self._operations.keys())
 
     @property
     def evaluate(self) -> int:
         '''
         Computes the value of the solution
         '''
-        raise "Not implemented error"
+        return self.objective
 
     @property
     def objective(self) -> int:
         '''
         Returns the value of the objective function
         '''
-        raise "Not implemented error"
+        return self.total_energy_consumption + self.cmax
 
     @property
     def cmax(self) -> int:
         '''
         Returns the maximum completion time of a job
         '''
-        raise "Not implemented error"
+        return max(op.end_time for op in self._operations.keys())
 
     @property
     def sum_ci(self) -> int:
         '''
         Returns the sum of completion times of all the jobs
         '''
-        raise "Not implemented error"
+        return sum(op.end_time for op in self._operations.keys())
 
     @property
     def total_energy_consumption(self) -> int:
@@ -80,7 +83,7 @@ class Solution(object):
         Returns the total energy consumption for processing
         all the jobs (including energy for machine switched on but doing nothing).
         '''
-        raise "Not implemented error"
+        return sum(machine.total_energy_consumption for machine in self._instance.machines)
 
     def __str__(self) -> str:
         '''
@@ -113,14 +116,16 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
-        raise "Not implemented error"
-
+        return [
+            op for op in self._operations.keys()
+            if op.is_ready(min(machine.available_time for machine in self._instance.machines))
+        ]
     @property
     def all_operations(self) -> List[Operation]:
         '''
         Returns all the operations in the instance
         '''
-        raise "Not implemented error"
+        return list(self._operations.keys())
 
     def schedule(self, operation: Operation, machine: Machine):
         '''
@@ -129,7 +134,8 @@ class Solution(object):
         @param operation: an operation that is available for scheduling
         '''
         assert(operation in self.available_operations)
-        raise "Not implemented error"
+        start_time = max(machine.available_time, operation.min_start_time)
+        machine.add_operation(operation, start_time)
 
     def gantt(self, colormapname):
         """
