@@ -102,7 +102,7 @@ class Operation(object):
         Returns the machine ID it is assigned to if any
         and -1 otherwise
         '''
-        return self._schedule_info.assigned_to if self.assigned else -1
+        return self._schedule_info.machine_id if self.assigned else -1
 
 
     @property
@@ -143,7 +143,7 @@ class Operation(object):
         and processed before at_time.
         False otherwise
         '''
-        return all(pred.end_time <= at_time for pred in self._predecessors)
+        return all((0 <= pred.end_time <= at_time) for pred in self._predecessors)
 
     def schedule(self, machine_id: int, at_time: int, check_success=True) -> bool:
         '''
