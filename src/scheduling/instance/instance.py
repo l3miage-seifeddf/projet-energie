@@ -3,13 +3,13 @@ Information for the instance of the optimization problem.
 
 @author: Vassilissa Lehoux
 '''
-from typing import List
-import os
 import csv
+import os
+from typing import List
 
 from src.scheduling.instance.job import Job
-from src.scheduling.instance.operation import Operation
 from src.scheduling.instance.machine import Machine
+from src.scheduling.instance.operation import Operation
 
 
 class Instance(object):
@@ -37,8 +37,17 @@ class Instance(object):
                 key = (job_id, operation_id)
                 if key not in seen_operations:
                     operation = Operation(job_id, operation_id)
+                    operation.processing_times = {int(row[i]): int(row[i + 1]) for i in range(2, len(row) - 1, 2)}
+                    operation.energies = {int(row[i]): int(row[i + 1]) for i in range(3, len(row) - 1, 2)}
                     inst._operations.append(operation)
                     seen_operations.add(key)
+                else:
+                    # If the operation already axists, add the processing time and energy for the machine
+                    operation = inst.get_operation(operation_id)
+                    operation.processing_times[int(row[2])] = int(row[3])
+                    operation.energies[int(row[4])] = int(row[5])
+
+
 
 
         # reading machine info

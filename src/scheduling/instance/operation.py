@@ -34,6 +34,8 @@ class Operation(object):
         self._schedule_info = None
         self._predecessors = []
         self._successors = []
+        self.energies = {}
+        self.processing_times = {}
 
 
     def __str__(self):
@@ -153,7 +155,7 @@ class Operation(object):
         '''
         if check_success and not self.is_ready(at_time):
             return False
-        self._schedule_info = OperationScheduleInfo(machine_id, at_time, self.processing_time, self.energy)
+        self._schedule_info = OperationScheduleInfo(machine_id, at_time, self.processing_times[machine_id], self.energies[machine_id])
         return True
 
     @property
