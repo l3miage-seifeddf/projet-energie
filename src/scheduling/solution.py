@@ -116,10 +116,24 @@ class Solution(object):
         Returns the available operations for scheduling:
         all constraints have been met for those operations to start
         '''
-        return [
-            op for op in self._operations.keys()
-            if op.is_ready(min(machine.available_time for machine in self._instance.machines))
-        ]
+        available = []
+        for job in self._instance.jobs:
+            for op in job.operations:
+                if op.assigned:
+                    continue
+
+                if op == job.operations[0]:
+                    available.append(op)
+                    break
+
+                prev_op = job.operations[job.operations.index(op) - 1]
+                if prev_op.assigned and prev_op.end_time <= max(m.available_time for m in self._instance.machines):
+                    available.append(op)
+                    break
+
+        return available
+
+
     @property
     def all_operations(self) -> List[Operation]:
         '''
@@ -133,9 +147,18 @@ class Solution(object):
         Starts the machine if stopped.
         @param operation: an operation that is available for scheduling
         '''
-        assert(operation in self.available_operations)
-        start_time = max(machine.available_time, operation.min_start_time)
+        assert (operation in self.available_operations)
+
+        machine_is_on = len(machine.start_times) > len(machine.stop_times)
+
+        if not machine_is_on:
+            start_up_time = max(0, operation.min_start_time - machine.set_up_time)
+            machine.start_times.append(start_up_time)
+            start_time = max(machine.available_time, start_up_time + machine.set_up_time)
+        else:
+            start_time = max(machine.available_time, operation.min_start_time)
         machine.add_operation(operation, start_time)
+
 
     def gantt(self, colormapname):
         """

@@ -34,7 +34,6 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(operation.assigned, True, 'operation should be assigned')
         self.assertEqual(operation.assigned_to, 1, 'wrong machine machine')
         self.assertEqual(operation.processing_time, 12, 'wrong operation duration')
-        # were here and test fails here
         self.assertEqual(operation.energy, 12, 'wrong operation energy cost')
         self.assertEqual(operation.start_time, 20, 'wrong set up time for machine')
         self.assertEqual(operation.end_time, 32, 'wrong operation end time')

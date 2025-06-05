@@ -28,7 +28,7 @@ class Machine(object):
         self._tear_down_time = tear_down_time
         self._tear_down_energy = tear_down_energy
         self._min_consumption = min_consumption
-        self._end_time = end_time
+        self.end_time = end_time
         self._scheduled_operations = []
         self._start_times = []
         self._stop_times = []
@@ -74,11 +74,29 @@ class Machine(object):
         as soon as possible after time start_time.
         Returns the actual start time.
         '''
+
         self._scheduled_operations.append(operation)
         operation.schedule(self._machine_id, start_time)
         self._available_time = operation.end_time
+
+        if len(self._scheduled_operations) == 1:
+            if start_time + operation.processing_time + self._tear_down_time > self.end_time / 2:
+                self.stop(operation.end_time)
+        else:
+
+            last_op = self._scheduled_operations[-1]
+            idle_time = start_time - last_op.end_time
+
+
+            if idle_time > (self._set_up_time + self._tear_down_time):
+                idle_energy = idle_time * self._min_consumption
+                switch_energy = self._set_up_energy + self._tear_down_energy
+                if idle_energy > switch_energy:
+                    self.stop(last_op.end_time)
+
         return operation.start_time
-  
+
+
     def stop(self, at_time):
         """
         Stops the machine at time at_time.
@@ -91,7 +109,17 @@ class Machine(object):
         '''
         Total time during which the machine is running
         '''
-        return sum(op.processing_time for op in self._scheduled_operations)
+        if not self._start_times:
+            return 0
+
+        total_time = 0
+        for i in range(len(self._start_times)):
+            start = self._start_times[i]
+            stop = self._stop_times[i] if i < len(self._stop_times) else self.end_time
+            total_time += stop - start
+
+        return total_time
+
 
     @property
     def start_times(self) -> List[int]:
