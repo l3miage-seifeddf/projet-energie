@@ -26,15 +26,20 @@ class Instance(object):
     @classmethod
     def from_file(cls, folderpath):
         inst = cls(os.path.basename(folderpath))
-        # Reading the operation info
+        # Reading the operation inf
+        seen_operations = set()
         with open(folderpath + os.path.sep + inst._instance_name + '_op.csv', 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
             header = next(csv_reader)
             for row in csv_reader:
                 job_id = int(row[0])
                 operation_id = int(row[1])
-                operation = Operation(job_id, operation_id)
-                inst._operations.append(operation)
+                key = (job_id, operation_id)
+                if key not in seen_operations:
+                    operation = Operation(job_id, operation_id)
+                    inst._operations.append(operation)
+                    seen_operations.add(key)
+
 
         # reading machine info
         with open(folderpath + os.path.sep + inst._instance_name + '_mach.csv', 'r') as csv_file:
