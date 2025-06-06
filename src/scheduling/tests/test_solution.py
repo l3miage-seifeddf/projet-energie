@@ -3,12 +3,12 @@ Test of the Solution class.
 
 @author: Vassilissa Lehoux
 '''
-import unittest
 import os
+import unittest
 
 from src.scheduling.instance.instance import Instance
 from src.scheduling.solution import Solution
-from src.scheduling.tests.test_utils import TEST_FOLDER_DATA, TEST_FOLDER
+from src.scheduling.tests.test_utils import TEST_FOLDER, TEST_FOLDER_DATA
 
 
 class TestSolution(unittest.TestCase):
@@ -77,20 +77,50 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(sol.is_feasible, 'Solution should be feasible')
         plt = sol.gantt('tab20')
         plt.savefig(TEST_FOLDER + os.path.sep +  'temp.png')
+        sol.to_csv()
 
-        def test_objective():
-            '''
-            Test your objective function
-            '''
-            self.assertEqual(sol.objective, 20)
-        test_objective()
+    def test_objective(self):
+        '''
+        Test your objective function
+        '''
+        inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp_minimal")
+        sol = Solution(inst)
+        operation = inst.operations[0]
+        machine = inst.machines[0]
+        sol.schedule(operation, machine)
+
+        self.assertTrue(operation.assigned)
+        self.assertEqual(operation.processing_time, 5)
+        self.assertEqual(operation.energy, 10)
+        self.assertEqual(operation.start_time, 0)
+        self.assertEqual(operation.end_time, 5)
+
+        # Calcul attendu :
+        # total_energy_consumption = 10 (juste l'opération, pas de setup/teardown/min)
+        # cmax = 5 (fin de l'opération)
+        # mean_processing_time = 5 (1 job, 1 opération)
+        # objective = 10 + 5 + 5 = 20
+        self.assertEqual(sol.objective, 20, "Objective should be 20 for this minimal instance")
+
+    def test_evaluate(self):
+        '''
+        Test your evaluate function
+        '''
+        inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp_minimal")
+        sol_unfeasible = Solution(inst)
+        eval_unfeasible = sol_unfeasible.evaluate
+        self.assertFalse(sol_unfeasible.is_feasible)
+        self.assertTrue(eval_unfeasible > 100000, "Unfeasible solution should be heavily penalized")
+
+        sol_feasible = Solution(inst)
+        operation = inst.operations[0]
+        machine = inst.machines[0]
+        sol_feasible.schedule(operation, machine)
+        eval_feasible = sol_feasible.evaluate
+        self.assertTrue(sol_feasible.is_feasible)
+        self.assertEqual(eval_feasible, sol_feasible.objective)
 
 
-        def test_evaluate(self):
-            '''
-            Test your evaluate function
-            '''
-            pass
 
 
 if __name__ == "__main__":

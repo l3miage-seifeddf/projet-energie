@@ -85,7 +85,7 @@ class Machine(object):
         """
         Stops the machine at time at_time.
         """
-        assert(self.available_time + self.tear_down_time <= at_time)
+        assert(self.available_time <= at_time)
         self._stop_times.append(at_time)
 
     def start(self, at_time):
@@ -152,10 +152,11 @@ class Machine(object):
         energy = sum(op.energy for op in self._scheduled_operations)
         energy += len(self._start_times) * self._set_up_energy
         energy += len(self._stop_times) * self._tear_down_energy
-        if self._available_time < self.end_time:
-            energy += self._min_consumption * (self.end_time - self._available_time)
-        else:
-            energy += self._min_consumption * (self.end_time - self.stop_times[-1])
+
+        min_consumption_time = self.working_time - sum(op.processing_time for op in self._scheduled_operations)
+
+        energy += self._min_consumption * min_consumption_time
+
         return energy
 
     def __str__(self):
