@@ -16,8 +16,8 @@ def _evaluate_cost(operation, machine) -> float:
     Evaluates the cost of assigning an operation to a machine.
     Cost can be based on energy consumption or duration.
     '''
-    energy_cost = machine.total_energy_consumption
-    duration_cost = operation.processing_time
+    energy_cost = operation.energies[machine.machine_id]
+    duration_cost = operation.processing_times[machine.machine_id]
     return energy_cost + duration_cost
 
 
@@ -84,7 +84,7 @@ class NonDeterminist(Heuristic):
         solution = Solution(instance)
         for job in instance.jobs:
             for operation in job.operations:
-                feasible_machines = [machine for machine in operation.machines if
+                feasible_machines = [machine for machine in instance.machines if
                                      machine.available_time <= operation.min_start_time]
                 if feasible_machines:
                     selected_machine = random.choice(feasible_machines)

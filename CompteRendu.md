@@ -68,3 +68,47 @@ Si on calcule le temps total pour effectuer toutes les opérations, on obtient :
 On arrive donc à un temps total de 20 unités de temps, 
 ce qui dépasse la durée maximale du planning de 10 unités de temps. L'instance n'est pas réalisable selon nos
 contraintes définies.
+
+## Premières heuristiques
+1) Proposer un algorithme glouton déterministe qui construit une solution. Préciser en quoi cet algorithme est glouton.
+Il sera implémenté dans la classe ```Greedy``` du module ```optim.constructive```.
+
+L'algorithme proposé suit le principe suivant : 
+Pour chaque opération de chaque job, il évalue toutes les machines,
+Il sélectionne immédiatement la machine qui a le coût minimal pour cette opération,
+Il attribue définitivement l’opération à cette machine, et ne revient jamais en arrière pour changer ses choix précédents.
+
+Cet algorithme est glouton car il prend à chaque étape la meilleure décision locale, en espérant que cela mène à une solution globale satisfaisante.
+
+2) Proposer un algorithme non-déterministe qui construit une solution différente pour la même instance à chaque appel.
+Il sera implémenté dans la classe ```NonDeterminist``` du module ```optim.constructive```.
+
+L'algorithme proposé suit le principe suivant : 
+Pour chaque opération de chaque job, il évalue toutes les machines,
+Il fait ensuite un choix aléatoire parmi les machines disponibles.
+
+Par la suite à chaque exécution, le résultat peut être différent même avec la même instance.
+
+3) Pour chacun des algorithmes, indiquer sa complexité.
+
+Les deux algorithmes ont une compléxité de O(m*j*o),
+m étant le nombre de machines,
+j étant le nombre de jobs,
+et o étant le nombre d'opérations
+
+On peut dire que les deux compléxités sont **polynomiales**
+
+
+## Recherche locale
+1) Proposer deux voisinages de solutions. Dans chaque cas, vous indiquerez (en le justifiant)
+- la taille du voisinage, 
+- si le voisinage est de taille polynomiale par rapport à la taille de l'instance
+- si on peut atteindre toutes les solutions de l'espace de solution en l'utilisant
+2) Implémenter ces voisinages dans le module ```optim.neighborhoods```.
+3) Implémenter dans le module ```optim.local_search``` deux algorithmes de recherche locale.
+   Dans les deux cas, la solution initiale sera obtenue par la classe ```NonDeterminist```.
+   - Le premier utilisera un seul voisinage et la première solution améliorante pour chaque exploration de voisinage.
+   - Le second utilisera les deux voisinages et la meilleure solution de chaque voisinage. Au besoin, on pourra ajouter un critère d'arrêt supplémentaire.
+4) Comparer ces deux algorithmes et l'algorithme glouton en termes de temps de calcul et de qualité des solutions obtenues.
+   Les algorithmes non-déterministes seront exécutés le même nombre de fois chacun et on gardera la meilleure solution.
+   Pour cette question, vous devez implémenter votre propre script et vous pouvez utiliser les instances présentes dans ```data```.
