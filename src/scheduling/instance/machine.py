@@ -37,7 +37,7 @@ class Machine(object):
 
     def reset(self):
         self._start_times = []
-        self._stop_times = [self.end_time]
+        self._stop_times = []
         self._scheduled_operations = []
         self._available_time = 0
 

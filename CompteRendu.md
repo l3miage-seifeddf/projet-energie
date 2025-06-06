@@ -104,6 +104,47 @@ Nous avons rajouté des tests pour ces heuristiques dans test_constructive.py
 - la taille du voisinage, 
 - si le voisinage est de taille polynomiale par rapport à la taille de l'instance
 - si on peut atteindre toutes les solutions de l'espace de solution en l'utilisant
+
+#### Première solution de voisinage : changer la machine sur laquelle s'execute une opération 
+
+
+La taille du voisinage est égale au nombre d'opérations dans la solution multiplié par le nombre de machines disponibles.
+On a donc une taille de voisinage de O(O * (M-1)), où o est le nombre d'opérations et m le nombre de machines. 
+Le voisinage est de taille polynomiale par rapport à la taille de l'instance.
+
+On peut atteindre toutes les solutions de l'espace de solution en l'utilisant, 
+car on peut changer la machine de chaque opération indépendamment des autres. On finira par explorer toutes les
+combinaisons possibles de machines pour chaque opération.
+
+
+#### Deuxième solution de voisinage : Permutations d'ordre sur une machine
+
+Pour chaque machine, si on compte k opérations planifiées sur cette machine, il y a k * (k-1) / 2 
+permutations possibles de ces opérations.
+
+On note 
+- N = le nombre d'opérations dans la solution 
+- M = le nombre de machines
+
+La taille du voisinage est maximum la somme sur toutes les machines des k_i×(k_i-1)/2, 
+où k_i est le nombre d’opérations sur la machine i : 
+
+$$
+\sum_{i=1}^{m} \frac{k_i (k_i - 1)}{2}
+$$
+
+
+Dans le pire des cas, si toutes les opérations sont sur la même machine,
+la taille du voisinage est de O(N^2), où N est le nombre total d'opérations.
+Le voisinage est de taille polynomiale par rapport à la taille de l'instance, car il est proportionnel au carré du
+nombre d'opérations.
+
+En utilisant uniquement ce voisinage, on ne peut pas atteindre toutes les solutions possibles (on ne peut pas changer 
+l’affectation machine d’une opération), mais on peut atteindre toutes les permutations d’ordre pour une affectation 
+machine donnée.
+
+
+
 2) Implémenter ces voisinages dans le module ```optim.neighborhoods```.
 3) Implémenter dans le module ```optim.local_search``` deux algorithmes de recherche locale.
    Dans les deux cas, la solution initiale sera obtenue par la classe ```NonDeterminist```.
