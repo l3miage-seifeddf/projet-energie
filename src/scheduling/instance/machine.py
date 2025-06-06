@@ -37,7 +37,7 @@ class Machine(object):
 
     def reset(self):
         self._start_times = []
-        self._stop_times = []
+        self._stop_times = [self.end_time]
         self._scheduled_operations = []
         self._available_time = 0
 
@@ -78,22 +78,6 @@ class Machine(object):
         self._scheduled_operations.append(operation)
         operation.schedule(self._machine_id, start_time)
         self._available_time = operation.end_time
-
-        if len(self._scheduled_operations) == 1:
-            if start_time + operation.processing_time + self._tear_down_time > self.end_time / 2:
-                self.stop(operation.end_time)
-        else:
-
-            last_op = self._scheduled_operations[-1]
-            idle_time = start_time - last_op.end_time
-
-
-            if idle_time > (self._set_up_time + self._tear_down_time):
-                idle_energy = idle_time * self._min_consumption
-                switch_energy = self._set_up_energy + self._tear_down_energy
-                if idle_energy > switch_energy:
-                    self.stop(last_op.end_time)
-
         return operation.start_time
 
 
@@ -135,7 +119,7 @@ class Machine(object):
         Returns the list of the times at which the machine is stopped
         in increasing order
         """
-        return self._stop_times
+        return sorted(self._stop_times)
 
     @property
     def total_energy_consumption(self) -> int:
@@ -152,3 +136,10 @@ class Machine(object):
 
     def __repr__(self):
         return str(self)
+
+
+    def _calculate_stop_times(self):
+        """
+        If the
+        """
+
