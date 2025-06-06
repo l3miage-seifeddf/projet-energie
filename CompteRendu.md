@@ -95,9 +95,9 @@ Les deux algorithmes ont une compléxité de O(m*j*o),
 m étant le nombre de machines,
 j étant le nombre de jobs,
 et o étant le nombre d'opérations
-
 On peut dire que les deux compléxités sont **polynomiales**
 
+Nous avons rajouté des tests pour ces heuristiques dans test_constructive.py
 
 ## Recherche locale
 1) Proposer deux voisinages de solutions. Dans chaque cas, vous indiquerez (en le justifiant)
