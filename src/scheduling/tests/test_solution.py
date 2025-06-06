@@ -78,12 +78,13 @@ class TestSolution(unittest.TestCase):
         plt = sol.gantt('tab20')
         plt.savefig(TEST_FOLDER + os.path.sep +  'temp.png')
 
-        def test_objective(self):
+        def test_objective():
             '''
             Test your objective function
             '''
             self.assertEqual(sol.objective, 20)
-            pass
+        test_objective()
+
 
         def test_evaluate(self):
             '''

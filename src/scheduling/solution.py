@@ -149,14 +149,11 @@ class Solution(object):
         '''
         assert (operation in self.available_operations)
 
-        machine_is_on = len(machine.start_times) > len(machine.stop_times)
-
-        if not machine_is_on:
+        start_time = max(machine.available_time, operation.min_start_time)
+        if not machine.is_on(start_time):
             start_up_time = max(0, operation.min_start_time - machine.set_up_time)
-            machine.start_times.append(start_up_time)
+            machine.start(start_up_time)
             start_time = max(machine.available_time, start_up_time + machine.set_up_time)
-        else:
-            start_time = max(machine.available_time, operation.min_start_time)
         machine.add_operation(operation, start_time)
 
 

@@ -85,8 +85,31 @@ class Machine(object):
         """
         Stops the machine at time at_time.
         """
-        assert(self.available_time >= at_time)
+        assert(self.available_time + self.tear_down_time <= at_time)
         self._stop_times.append(at_time)
+
+    def start(self, at_time):
+        """
+        Starts the machine at time at_time.
+        """
+        self._start_times.append(at_time)
+        if len(self.stop_times) == 0:
+            self._stop_times.append(self.end_time)
+
+    def is_on(self, at_time: int) -> bool:
+        """
+        Returns True if the machine is running at time at_time.
+        """
+        if not self._start_times:
+            return False
+        if at_time < self._start_times[0]:
+            return False
+        for i in range(len(self._start_times)):
+            start = self._start_times[i]
+            stop = self._stop_times[i] if i < len(self._stop_times) else self.end_time
+            if start <= at_time < stop:
+                return True
+        return False
 
     @property
     def working_time(self) -> int:
@@ -111,7 +134,7 @@ class Machine(object):
         Returns the list of the times at which the machine is started
         in increasing order
         """
-        return self._start_times
+        return sorted(self._start_times)
 
     @property
     def stop_times(self) -> List[int]:
@@ -129,6 +152,10 @@ class Machine(object):
         energy = sum(op.energy for op in self._scheduled_operations)
         energy += len(self._start_times) * self._set_up_energy
         energy += len(self._stop_times) * self._tear_down_energy
+        if self._available_time < self.end_time:
+            energy += self._min_consumption * (self.end_time - self._available_time)
+        else:
+            energy += self._min_consumption * (self.end_time - self.stop_times[-1])
         return energy
 
     def __str__(self):
