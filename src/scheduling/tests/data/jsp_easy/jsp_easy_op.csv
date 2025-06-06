@@ -1,0 +1,5 @@
+job,operation,machine,processing_time,energy_consumption
+0,0,0,5,10
+0,0,1,3,8
+1,0,0,4,7
+1,0,1,6,12
