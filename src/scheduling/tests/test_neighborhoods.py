@@ -8,7 +8,6 @@ from src.scheduling.tests.test_utils import TEST_FOLDER_DATA
 
 
 def create_initial_solution():
-    """Helper pour créer une nouvelle solution initiale"""
     inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp_test_neighborhoods")
     solution = Solution(inst)
 

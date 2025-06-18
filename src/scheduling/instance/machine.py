@@ -3,6 +3,7 @@ Machine on which operation are executed.
 
 @author: Vassilissa Lehoux
 '''
+import sys
 from typing import List
 from src.scheduling.instance.operation import Operation
 
@@ -144,6 +145,37 @@ class Machine(object):
         """
         return sorted(self._stop_times)
 
+    def remove_operation(self, operation: Operation):
+        """
+        Removes an operation from the machine.
+        """
+        if operation in self._scheduled_operations:
+            self._scheduled_operations.remove(operation)
+            self._available_time = operation.start_time
+            self.recalculate_available_time(min_gap=sys.maxsize)
+
+    def recalculate_available_time(self, min_gap: int = 0):
+        """
+        Recalcule le prochain instant où la machine est disponible,
+        en tenant compte des créneaux libres entre opérations.
+        min_gap : durée minimale requise pour considérer un créneau comme disponible.
+        """
+        if not self._scheduled_operations:
+            self._available_time = 0
+            return
+
+        # Trie les opérations par start_time
+        ops = sorted(self._scheduled_operations, key=lambda op: op.start_time)
+        # Vérifie les créneaux entre les opérations
+        for i in range(len(ops) - 1):
+            gap = ops[i + 1].start_time - ops[i].end_time
+            if gap >= min_gap:
+                self._available_time = ops[i].end_time
+                return
+
+        # Sinon, disponible après la dernière opération
+        self._available_time = ops[-1].end_time
+
     @property
     def total_energy_consumption(self) -> int:
         """
@@ -166,8 +198,4 @@ class Machine(object):
         return str(self)
 
 
-    def _calculate_stop_times(self):
-        """
-        If the
-        """
 
