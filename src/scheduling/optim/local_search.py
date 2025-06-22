@@ -35,10 +35,11 @@ class FirstNeighborLocalSearch(Heuristic):
         '''
         self.params = params
 
-    def run(self, instance: Instance, nonDeterminist: NonDeterminist,
-            machineSwitchNeighborhood: MachineSwitchNeighborhood, params: Dict = dict()) -> Solution:
+    def run(self, instance, params: Dict = dict()) -> Solution:
+        self.nonDeterminist = params['nonDeterminist']
+        self.machineSwitchNeighborhood = params['machineSwitchNeighborhood']
         # Génère une solution initiale
-        current_solution = nonDeterminist.run(instance)
+        current_solution = self.nonDeterminist.run(instance)
 
         improved = True
 
@@ -47,7 +48,7 @@ class FirstNeighborLocalSearch(Heuristic):
 
             current_solution_copy = copy.deepcopy(current_solution)
 
-            neighbor_solution = machineSwitchNeighborhood.first_better_neighbor(current_solution_copy)
+            neighbor_solution = self.machineSwitchNeighborhood.first_better_neighbor(current_solution_copy)
 
             if neighbor_solution.evaluate < current_solution.evaluate:
                 current_solution = neighbor_solution
@@ -75,10 +76,8 @@ class BestNeighborLocalSearch(Heuristic):
         '''
         self.params = params
 
-    def run(self, instance: Instance, nonDeterminist: NonDeterminist,
-            operationOrderNeighborhood: OperationOrderNeighborhood,
-            machineSwitchNeighborhood: MachineSwitchNeighborhood,
-            params: Dict=dict()) -> Solution:
+
+    def run(self, instance: Instance, params: Dict=dict()) -> Solution:
         '''
         Computes a solution for the given instance.
         Implementation should provide default values in the function
@@ -89,15 +88,18 @@ class BestNeighborLocalSearch(Heuristic):
         @param NeighborClass: the class of neighborhood used in the vanilla local search
         @param params: the parameters for the run
         '''
-        current_solution = nonDeterminist.run(instance)
+        self.nonDeterminist = params['nonDeterminist']
+        self.machineSwitchNeighborhood = params['machineSwitchNeighborhood']
+        self.operationOrderNeighborhood = params['operationOrderNeighborhood']
+        current_solution = self.nonDeterminist.run(instance)
 
         first_solution = copy.deepcopy(current_solution)
 
-        first_neighbor_solution = machineSwitchNeighborhood.best_neighbor(first_solution)
+        first_neighbor_solution = self.machineSwitchNeighborhood.best_neighbor(first_solution)
 
         second_solution = copy.deepcopy(first_solution)
 
-        second_neighbor_solution = operationOrderNeighborhood.best_neighbor(second_solution)
+        second_neighbor_solution = self.operationOrderNeighborhood.best_neighbor(second_solution)
 
         if second_neighbor_solution.evaluate < first_neighbor_solution.evaluate:
             current_solution = second_neighbor_solution
@@ -114,7 +116,25 @@ if __name__ == "__main__":
     from src.scheduling.tests.test_utils import TEST_FOLDER_DATA
     import os
     inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
-    heur = FirstNeighborLocalSearch()
-    sol = heur.run(inst, NonDeterminist, MachineSwitchNeighborhood)
-    plt = sol.gantt("tab20")
-    plt.savefig("gantt.png")
+    nondeterminist = NonDeterminist()
+    machineSwitchNeighborhood = MachineSwitchNeighborhood(inst)
+    operationOrderNeighborhood = OperationOrderNeighborhood(inst)
+
+    params1 = {
+        'nonDeterminist': nondeterminist,
+        'machineSwitchNeighborhood': machineSwitchNeighborhood
+    }
+    heur1 = FirstNeighborLocalSearch()
+    sol1 = heur1.run(inst, params1)
+    plt1 = sol1.gantt("tab20")
+    plt1.savefig("../img/gantt1.png")
+
+    params2 = {
+        'nonDeterminist': nondeterminist,
+        'machineSwitchNeighborhood': machineSwitchNeighborhood,
+        'operationOrderNeighborhood': operationOrderNeighborhood
+    }
+    heur2 = BestNeighborLocalSearch()
+    sol2 = heur2.run(inst, params2)
+    plt2 = sol2.gantt("tab20")
+    plt2.savefig("../img/gantt2.png")
