@@ -146,9 +146,15 @@ machine donnée.
 
 
 2) Implémenter ces voisinages dans le module ```optim.neighborhoods```.
+Nous avons rajouté des tests liés aux voisinnages, et nous avons eu des echecs qui ont ressortis une anomalie
+dans la fonction available_operations, donc ça a été corrigé.
+
 3) Implémenter dans le module ```optim.local_search``` deux algorithmes de recherche locale.
    Dans les deux cas, la solution initiale sera obtenue par la classe ```NonDeterminist```.
    - Le premier utilisera un seul voisinage et la première solution améliorante pour chaque exploration de voisinage.
+      Nous avons choisi pour cela le premier voisinage MachineSwitchNeighborhood par souci de simplicité,
+      et parce qu'il parcourt tout l'ensemble des solutions possibles.
+
    - Le second utilisera les deux voisinages et la meilleure solution de chaque voisinage. Au besoin, on pourra ajouter un critère d'arrêt supplémentaire.
 4) Comparer ces deux algorithmes et l'algorithme glouton en termes de temps de calcul et de qualité des solutions obtenues.
    Les algorithmes non-déterministes seront exécutés le même nombre de fois chacun et on gardera la meilleure solution.

@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # To play with the heuristics
     from src.scheduling.tests.test_utils import TEST_FOLDER_DATA
     import os
-    inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp10")
+    inst = Instance.from_file(TEST_FOLDER_DATA + os.path.sep + "jsp1")
     heur = FirstNeighborLocalSearch()
     sol = heur.run(inst, NonDeterminist, MachineSwitchNeighborhood)
     plt = sol.gantt("tab20")
