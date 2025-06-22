@@ -1,8 +1,7 @@
 # Compte rendu du TP énergie
 
 ## Modélisation
-1) Quelles sont les variables de décision ? Quelles sont les contraintes ? Quels sont les objectifs ?
-
+1) 
 **Les variables de décision** :
 - $x_{i,j,m}$ = 1 si l'opération i de la tâche j tourne sur la machine m, 0 sinon
 - $y_{m,t}$ = 1 si la machine m est allumée à l'instant t, 0 sinon
@@ -25,8 +24,7 @@
 - Minimiser la consommation d'énergie
 - Minimiser la durée totale du planning
 
-2) **Proposez une fonction objectif qui agrège les différents objectifs de l'entreprise.**
-
+2)
 On peut proposer une fonction objectif qui agrège les différents objectifs de l'entreprise en utilisant une combinaison
 linéaire des deux objectifs. Par exemple, on peut définir la fonction objectif comme suit :
 $$
@@ -35,8 +33,7 @@ $$
 où $\alpha$ et $\beta$ sont des coefficients de pondération qui déterminent l'importance relative de chaque objectif.
 On peut ajuster ces coefficients en fonction des priorités de l'entreprise. Par exemple, si l'entreprise accorde plus d'importance à la réduction de la consommation d'énergie, on peut choisir $\alpha$ plus grand que $\beta$. Inversement, si la durée totale du planning est plus critique, on peut choisir $\beta$ plus grand que $\alpha$.
 
-3) **Comment évaluer (c'est-à-dire donner une valeur à) une solution réalisable ? Comment évaluer une solution non réalisable ?**
-
+3) 
 Pour évaluer une solution réalisable, on peut calculer la consommation d'énergie totale et la durée totale du planning 
 en utilisant les variables de décision et les constantes définies précédemment. La consommation d'énergie totale peut 
 être calculée en sommant la consommation d'énergie de chaque machine pendant la durée de son utilisation, en tenant 
@@ -49,9 +46,7 @@ la durée de dépassement. Si l'opération dépasse de 5 unités de temps on app
 de temps.
 
 
-4) **Proposer une instance pour laquelle il n’existe pas de solution réalisable et expliquer pourquoi aucune solution 
-n'est réalisable pour cette instance.**
-
+4)
 Une instance pour laquelle il n'existe pas de solution réalisable pourrait être la suivante :
 Supposons qu'on ait 1 tâche avec 3 opérations, et 2 machines.
   - Opération 1 : peut se faire sur la **machine 1** en *5 unités de temps*
@@ -70,9 +65,7 @@ ce qui dépasse la durée maximale du planning de 10 unités de temps. L'instanc
 contraintes définies.
 
 ## Premières heuristiques
-1) Proposer un algorithme glouton déterministe qui construit une solution. Préciser en quoi cet algorithme est glouton.
-Il sera implémenté dans la classe ```Greedy``` du module ```optim.constructive```.
-
+1) 
 L'algorithme proposé suit le principe suivant : 
 Pour chaque opération de chaque job, il évalue toutes les machines,
 Il sélectionne immédiatement la machine qui a le coût minimal pour cette opération,
@@ -80,8 +73,7 @@ Il attribue définitivement l’opération à cette machine, et ne revient jamai
 
 Cet algorithme est glouton car il prend à chaque étape la meilleure décision locale, en espérant que cela mène à une solution globale satisfaisante.
 
-2) Proposer un algorithme non-déterministe qui construit une solution différente pour la même instance à chaque appel.
-Il sera implémenté dans la classe ```NonDeterminist``` du module ```optim.constructive```.
+2) 
 
 L'algorithme proposé suit le principe suivant : 
 Pour chaque opération de chaque job, il évalue toutes les machines,
@@ -89,8 +81,7 @@ Il fait ensuite un choix aléatoire parmi les machines disponibles.
 
 Par la suite à chaque exécution, le résultat peut être différent même avec la même instance.
 
-3) Pour chacun des algorithmes, indiquer sa complexité.
-
+3)
 Les deux algorithmes ont une compléxité de O(m*j*o),
 m étant le nombre de machines,
 j étant le nombre de jobs,
