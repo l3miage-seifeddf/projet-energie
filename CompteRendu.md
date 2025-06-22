@@ -100,11 +100,7 @@ On peut dire que les deux compléxités sont **polynomiales**
 Nous avons rajouté des tests pour ces heuristiques dans test_constructive.py
 
 ## Recherche locale
-1) Proposer deux voisinages de solutions. Dans chaque cas, vous indiquerez (en le justifiant)
-- la taille du voisinage, 
-- si le voisinage est de taille polynomiale par rapport à la taille de l'instance
-- si on peut atteindre toutes les solutions de l'espace de solution en l'utilisant
-
+1) 
 #### Première solution de voisinage : changer la machine sur laquelle s'execute une opération 
 
 
@@ -145,17 +141,16 @@ machine donnée.
 
 
 
-2) Implémenter ces voisinages dans le module ```optim.neighborhoods```.
-Nous avons rajouté des tests liés aux voisinnages, et nous avons eu des echecs qui ont ressortis une anomalie
-dans la fonction available_operations, donc ça a été corrigé.
+2) Nous avons rajouté des tests liés aux voisinnages, et nous avons eu des echecs qui ont ressorti une anomalie
+   dans la fonction available_operations.
 
-3) Implémenter dans le module ```optim.local_search``` deux algorithmes de recherche locale.
-   Dans les deux cas, la solution initiale sera obtenue par la classe ```NonDeterminist```.
-   - Le premier utilisera un seul voisinage et la première solution améliorante pour chaque exploration de voisinage.
-      Nous avons choisi pour cela le premier voisinage MachineSwitchNeighborhood par souci de simplicité,
-      et parce qu'il parcourt tout l'ensemble des solutions possibles.
+3) On a implémenté ce qu'on pensait être correct, mais on a eu des échecs dans les tests.
+   Nous n'avons pas réussi à tester correctement les voisinages, mais nous pensons être sur le bon chemin.
+   Nous avons un problème depuis le début avec la gestion des objets. Etant donné que les objets sont des instances
+   de classes, on ne peut pas les comparer directement, et on a du mal à les manipuler. Et aussi certains objets sont 
+   donc modifiés et engendrent des effets de bords.
 
-   - Le second utilisera les deux voisinages et la meilleure solution de chaque voisinage. Au besoin, on pourra ajouter un critère d'arrêt supplémentaire.
-4) Comparer ces deux algorithmes et l'algorithme glouton en termes de temps de calcul et de qualité des solutions obtenues.
-   Les algorithmes non-déterministes seront exécutés le même nombre de fois chacun et on gardera la meilleure solution.
-   Pour cette question, vous devez implémenter votre propre script et vous pouvez utiliser les instances présentes dans ```data```.
+4) Nous avons implémenté un script dans le fichier ```script_test.py``` qui permet en théorie de comparer les solutions
+   générées par les heuristiques et les voisinages. 
+   Il permet de vérifier si les solutions sont réalisables, et si elles sont différentes.
+   Il permet aussi de vérifier si les solutions sont optimales en comparant les valeurs de la fonction objectif.
