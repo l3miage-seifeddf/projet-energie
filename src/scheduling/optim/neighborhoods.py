@@ -127,20 +127,17 @@ class OperationOrderNeighborhood(Neighborhood):
         Returns the best solution in the neighborhood of the solution.
         Can be the solution itself.
         '''
-        best_solution = sol
-        best_value = sol.evaluate
+        best_solution = copy.deepcopy(sol)
+        best_value = best_solution.evaluate
 
         for machine in self._instance.machines:
-            # Récupérer toutes les opérations sur cette machine
             machine_ops = [op for op in sol.all_operations if op.assigned_to == machine.machine_id]
-
-            # Pour chaque paire d'opérations sur la machine
             for i in range(len(machine_ops)):
                 for j in range(i + 1, len(machine_ops)):
-                    # Créer une nouvelle solution
                     neighbor = _create_neighbor_solution(sol, machine_ops[i], machine_ops[j], machine)
-
-                    # Évaluer le voisin
+                    # On ignore les voisins identiques à la solution initiale
+                    if neighbor is sol:
+                        continue
                     neighbor_value = neighbor.evaluate
                     if neighbor_value < best_value:
                         best_solution = neighbor
@@ -153,52 +150,63 @@ class OperationOrderNeighborhood(Neighborhood):
         Returns the first solution in the neighborhood of the solution
         that improves other it and the solution itself if none is better.
         '''
-        current_value = sol.evaluate
+        sol_copy = copy.deepcopy(sol)
+        current_value = sol_copy.evaluate
 
         for machine in self._instance.machines:
             # Récupérer toutes les opérations sur cette machine
-            machine_ops = [op for op in sol.all_operations if op.assigned_to == machine.machine_id]
+            machine_ops = [op for op in sol_copy.all_operations if op.assigned_to == machine.machine_id]
 
             # Pour chaque paire d'opérations sur la machine
             for i in range(len(machine_ops)):
                 for j in range(i + 1, len(machine_ops)):
-                    neighbor = _create_neighbor_solution(sol, machine_ops[i], machine_ops[j], machine)
+                    neighbor = _create_neighbor_solution(sol_copy, machine_ops[i], machine_ops[j], machine)
 
                     # Vérifie la faisabilité avant de retourner
                     if neighbor.is_feasible and neighbor.evaluate < current_value:
                         return neighbor
 
-        return sol
+        return sol_copy
 
 
 def _create_neighbor_solution(sol: Solution, op1, op2, machine):
     '''
     Helper function to create a neighbor solution by swapping two operations.
     '''
+
+    if op1.job_id == op2.job_id:
+        job_ops = [op for op in sol.all_operations if op.job_id == op1.job_id]
+        idx1 = job_ops.index(op1)
+        idx2 = job_ops.index(op2)
+        # On ne peut pas inverser si op1 précède op2 dans le job
+        if abs(idx1 - idx2) == 1:
+            # Si elles sont consécutives, on ne peut inverser que si op2 précède op1
+            if idx1 < idx2:
+                return sol  # On ne fait rien, inversion interdite
+        else:
+            # Si elles ne sont pas consécutives, on ne fait rien pour éviter les incohérences
+            return sol
+
     neighbor = copy.deepcopy(sol)
 
 
-    machine.remove_operation(op1)
-    machine.remove_operation(op2)
+    op1_copy = next(o for o in neighbor.all_operations if o.operation_id == op1.operation_id)
+    op2_copy = next(o for o in neighbor.all_operations if o.operation_id == op2.operation_id)
 
-    op1.reset()
-    op2.reset()
+    machine.remove_operation(op1_copy)
+    machine.remove_operation(op2_copy)
 
-    # S'assurer qu'elles ne sont pas dans d'autres listes
-    if hasattr(neighbor, "scheduled_operations"):
-        if op1 in neighbor.scheduled_operations:
-            neighbor.scheduled_operations.remove(op1)
-        if op2 in neighbor.scheduled_operations:
-            neighbor.scheduled_operations.remove(op2)
+    op1_copy.reset()
+    op2_copy.reset()
 
     # Les ajouter à available_operations
-    if op1 not in neighbor.available_operations:
-        neighbor.available_operations.append(op1)
-    if op2 not in neighbor.available_operations:
-        neighbor.available_operations.append(op2)
+    if op1_copy not in neighbor.available_operations:
+        neighbor.available_operations.append(op1_copy)
+    if op2_copy not in neighbor.available_operations:
+        neighbor.available_operations.append(op2_copy)
 
     # Réassigner dans l'ordre inverse
-    neighbor.schedule(op2, machine)
-    neighbor.schedule(op1, machine)
+    neighbor.schedule(op2_copy, machine)
+    neighbor.schedule(op1_copy, machine)
 
     return neighbor

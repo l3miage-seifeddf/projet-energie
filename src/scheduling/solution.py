@@ -186,19 +186,15 @@ class Solution(object):
         '''
         available = []
         for job in self._instance.jobs:
-            for op in job.operations:
+            for idx, op in enumerate(job.operations):
                 if op.assigned:
                     continue
-
-                if op == job.operations[0]:
+                if idx == 0:
                     available.append(op)
-                    break
-
-                prev_op = job.operations[job.operations.index(op) - 1]
-                if prev_op.assigned and prev_op.end_time <= max(m.available_time for m in self._instance.machines):
-                    available.append(op)
-                    break
-
+                else:
+                    prev_op = job.operations[idx - 1]
+                    if prev_op.assigned and prev_op.end_time <= max(m.available_time for m in self._instance.machines):
+                        available.append(op)
         return available
 
 
